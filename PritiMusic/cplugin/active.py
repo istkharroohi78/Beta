@@ -35,23 +35,31 @@ async def start(client: Client, message: Message):
     try:
         clone_served_chats = await get_served_chats_clone(bot_id)
         my_chat_ids = [int(chat["chat_id"]) for chat in clone_served_chats]
-    except:
+    except Exception:
         my_chat_ids = []
 
-    # FILTERING
+    # FILTERING (FIXED: Added int() casting and try-except for safety)
     my_audio_count = 0
-    for chat_id in global_audio:
-        if chat_id in my_chat_ids:
-            my_audio_count += 1
+    if global_audio:
+        for chat_id in global_audio:
+            try:
+                if int(chat_id) in my_chat_ids:
+                    my_audio_count += 1
+            except Exception:
+                continue
 
     my_video_count = 0
-    for chat_id in global_video:
-        if chat_id in my_chat_ids:
-            my_video_count += 1
+    if global_video:
+        for chat_id in global_video:
+            try:
+                if int(chat_id) in my_chat_ids:
+                    my_video_count += 1
+            except Exception:
+                continue
 
     # RESULT
     text = (
-        f"📊 <b><u>Bot Activity Status</u></b>\n\n"
+        f"📊 **Bot Activity Status**\n\n"
         f"👤 **Owner:** {message.from_user.mention}\n"
         f"🤖 **Bot:** @{client.me.username}\n\n"
         f"🏢 **Total Groups:** `{len(my_chat_ids)}`\n"
@@ -62,6 +70,6 @@ async def start(client: Client, message: Message):
     await waiting_msg.edit_text(
         text,
         reply_markup=InlineKeyboardMarkup(
-            [[InlineKeyboardButton("✯ Close ✯", callback_data=f"close")]]
+            [[InlineKeyboardButton("✯ Close ✯", callback_data="close")]]
         ),
     )
