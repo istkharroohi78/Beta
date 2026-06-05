@@ -1,17 +1,17 @@
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardMarkup
 from button import styled_button, ButtonStyle # Zaroori import
 
 # --- OPTION 1: Static ---
 buttons = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton(text="▷", callback_data="resume_cb"),
-            InlineKeyboardButton(text="II", callback_data="pause_cb"),
-            InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
-            InlineKeyboardButton(text="▢", callback_data="end_cb"),
+            styled_button(text="▷", callback_data="resume_cb", style=ButtonStyle.SUCCESS),
+            styled_button(text="II", callback_data="pause_cb", style=ButtonStyle.DANGER),
+            styled_button(text="‣‣I", callback_data="skip_cb", style=ButtonStyle.PRIMARY),
+            styled_button(text="▢", callback_data="end_cb", style=ButtonStyle.DANGER),
         ],
         [
-            InlineKeyboardButton(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.me/clone_MUSICrobot")
+            styled_button(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.me/clone_MUSICrobot", style=ButtonStyle.SUCCESS)
         ],
     ]
 )
@@ -19,8 +19,8 @@ buttons = InlineKeyboardMarkup(
 close_key = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true"),
-            InlineKeyboardButton(text="✯ CLOSE ✯", callback_data="close")
+            styled_button(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true", style=ButtonStyle.SUCCESS),
+            styled_button(text="✯ CLOSE ✯", callback_data="close", style=ButtonStyle.DANGER)
         ]
     ]
 )
@@ -29,25 +29,28 @@ close_key = InlineKeyboardMarkup(
 def stream_markup(chat_id):
     return InlineKeyboardMarkup(
         [
+            # Top Row: Basic Controls
             [
-                InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-                InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-                InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-                InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+                styled_button(text="▷", callback_data=f"ADMIN Resume|{chat_id}", style=ButtonStyle.SUCCESS),
+                styled_button(text="II", callback_data=f"ADMIN Pause|{chat_id}", style=ButtonStyle.DANGER),
+                styled_button(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}", style=ButtonStyle.PRIMARY),
+                styled_button(text="▢", callback_data=f"ADMIN Stop|{chat_id}", style=ButtonStyle.DANGER),
             ],
-            # --- NAYI ROW YAHAN ADD KI HAI ---
+            # Middle Row: Seek, Loop & Shuffle
             [
                 styled_button(text="<- 20s", callback_data=f"ADMIN SeekBack|{chat_id}", style=ButtonStyle.PRIMARY),
                 styled_button(text="🔁", callback_data=f"ADMIN Loop|{chat_id}", style=ButtonStyle.PRIMARY),
                 styled_button(text="🔀", callback_data=f"ADMIN Shuffle|{chat_id}", style=ButtonStyle.PRIMARY),
                 styled_button(text="20s + ->", callback_data=f"ADMIN SeekForward|{chat_id}", style=ButtonStyle.PRIMARY),
             ],
+            # Bottom Row 1: Clone
             [
-                InlineKeyboardButton(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.me/clone_MUSICrobot")
+                styled_button(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.me/clone_MUSICrobot", style=ButtonStyle.SUCCESS)
             ],
+            # Bottom Row 2: Add Me & Close
             [
-                InlineKeyboardButton(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true"),
-                InlineKeyboardButton(text="✯ CLOSE ✯", callback_data="close")
+                styled_button(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true", style=ButtonStyle.SUCCESS),
+                styled_button(text="✯ CLOSE ✯", callback_data="close", style=ButtonStyle.DANGER)
             ]
         ]
     )
