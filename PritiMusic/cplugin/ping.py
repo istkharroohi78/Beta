@@ -115,9 +115,9 @@ async def ping_clone(client: Client, message: Message):
             # Fallback to Text
             hmm = await message.reply_text(caption_text)
 
-    # Stats Calculation
+    # 🚀 FIXED: Non-blocking stats calculation
     upt = int(time.time() - _boot_)
-    cpu = psutil.cpu_percent(interval=0.5)
+    cpu = psutil.cpu_percent(interval=None) # Interval 'None' ensures it doesn't freeze the bot
     mem = psutil.virtual_memory().percent
     disk = psutil.disk_usage("/").percent
     resp = (datetime.now() - start).microseconds / 1000
@@ -138,7 +138,6 @@ async def ping_clone(client: Client, message: Message):
 
     # 🚀 FIXED: Zero Crash Edit Logic
     try:
-        # Check if the sent message contains media
         if hmm.photo or hmm.video or hmm.animation:
             await hmm.edit_caption(
                 caption=stats_text,
@@ -150,7 +149,7 @@ async def ping_clone(client: Client, message: Message):
                 reply_markup=markup,
             )
     except Exception:
-        # Agar user ne message delete kar diya ho ya server issue ho, toh error ignore karega
+        # User ne message delete kiya toh ignore karega
         pass
 
 
@@ -163,10 +162,11 @@ async def set_ping_image(client: Client, message: Message):
     bot = await client.get_me()
     bot_id = bot.id
     
+    # 🚀 FIXED: Proper Exception Handling for Async Function
     try:
         owner_id = await get_owner_id_from_db(bot_id)
-    except:
-        owner_id = get_owner_id_from_db(bot_id)
+    except Exception:
+        owner_id = OWNER_ID
         
     if message.from_user.id not in [OWNER_ID, owner_id]:
         return await message.reply_text("🚫 Only the Bot Owner can use this command.")
@@ -193,8 +193,8 @@ async def del_ping_image(client: Client, message: Message):
 
     try:
         owner_id = await get_owner_id_from_db(bot_id)
-    except:
-        owner_id = get_owner_id_from_db(bot_id)
+    except Exception:
+        owner_id = OWNER_ID
         
     if message.from_user.id not in [OWNER_ID, owner_id]:
         return await message.reply_text("🚫 Only the Bot Owner can use this command.")
@@ -210,8 +210,8 @@ async def set_ping_video(client: Client, message: Message):
     
     try:
         owner_id = await get_owner_id_from_db(bot_id)
-    except:
-        owner_id = get_owner_id_from_db(bot_id)
+    except Exception:
+        owner_id = OWNER_ID
         
     if message.from_user.id not in [OWNER_ID, owner_id]:
         return await message.reply_text("🚫 Only the Bot Owner can use this command.")
@@ -244,8 +244,8 @@ async def del_ping_video(client: Client, message: Message):
 
     try:
         owner_id = await get_owner_id_from_db(bot_id)
-    except:
-        owner_id = get_owner_id_from_db(bot_id)
+    except Exception:
+        owner_id = OWNER_ID
         
     if message.from_user.id not in [OWNER_ID, owner_id]:
         return await message.reply_text("🚫 Only the Bot Owner can use this command.")
