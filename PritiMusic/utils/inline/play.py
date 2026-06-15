@@ -70,7 +70,7 @@ def stream_markup_timer(_, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     
-    # Progress Bar calculation (Purana wala)
+    # Progress Bar calculation
     total_blocks = 10
     filled_blocks = int((played_sec / duration_sec) * total_blocks) if duration_sec != 0 else 0
     filled_blocks = min(max(filled_blocks, 0), total_blocks)
@@ -79,7 +79,8 @@ def stream_markup_timer(_, chat_id, played, dur):
     s_map = get_style_map()
     buttons = [
         [
-            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=s_map[1], no_emoji=True)
+            # Fixed: Using TRANSPARENT for Kaurigram compatibility
+            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=ButtonStyle.TRANSPARENT, no_emoji=True)
         ],
         [
             create_btn(text="▷", cb=f"ADMIN Resume|{chat_id}", style=s_map[3], no_emoji=True),
@@ -236,7 +237,8 @@ def stream_markup_timer2(_, chat_id, played, dur):
     s_map = get_style_map()
     buttons = [
         [
-            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=s_map[1], no_emoji=True)
+            # Fixed: Using TRANSPARENT for Kaurigram compatibility
+            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=ButtonStyle.TRANSPARENT, no_emoji=True)
         ],
         [
             create_btn(text="▷", cb=f"ADMIN Resume|{chat_id}", style=s_map[3], no_emoji=True),
@@ -359,7 +361,8 @@ def panel_markup_4(_, vidid, chat_id, played, dur):
     s_map = get_style_map()
     buttons = [
         [
-            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=s_map[1], no_emoji=True)
+            # Fixed: Using TRANSPARENT for Kaurigram compatibility
+            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=ButtonStyle.TRANSPARENT, no_emoji=True)
         ],
         [
             create_btn(text="II ᴘᴀᴜsᴇ", cb=f"ADMIN Pause|{chat_id}", style=s_map[2], no_emoji=True),
@@ -389,7 +392,8 @@ def panel_markup_clone(_, vidid, chat_id, played, dur):
     s_map = get_style_map()
     buttons = [
         [
-            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=s_map[1], no_emoji=True)
+            # Fixed: Using TRANSPARENT for Kaurigram compatibility
+            create_btn(text=f"{played} {bar} {dur}", cb="GetTimer", style=ButtonStyle.TRANSPARENT, no_emoji=True)
         ],
         [
             create_btn(text="▷", cb=f"ADMIN Resume|{chat_id}", style=s_map[3], no_emoji=True),
