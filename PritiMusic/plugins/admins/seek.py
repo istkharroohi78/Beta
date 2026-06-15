@@ -11,7 +11,8 @@ from PritiMusic.utils.inline import close_markup
 from config import BANNED_USERS
 
 @app.on_message(
-    filters.command(["seek", "cseek", "seekback", "cseekback"])
+    # 🟢 THE FIX: Custom prefixes add kar diye hain yahan
+    filters.command(["seek", "cseek", "seekback", "cseekback"], prefixes=["/", "!", "#"])
     & filters.group
     & ~BANNED_USERS
 )
