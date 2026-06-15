@@ -1,9 +1,5 @@
-asyncio
-pyrofork
-gTTS
 aiofiles
 aiohttp
-ffmpeg
 beautifulsoup4
 dnspython
 ffmpeg-python
@@ -17,7 +13,7 @@ opencv-python-headless
 pytz
 pillow==9.5.0
 psutil
-py-tgcalls==0.9.7
+py-tgcalls
 pykeyboard
 python-dotenv
 pyyaml
@@ -26,7 +22,7 @@ SafoneAPI
 speedtest-cli
 spotipy
 tgcrypto>=1.2.5
-pyrogram>=2.0.106
+kurigram
 telegraph
 unidecode
 youtube-search
