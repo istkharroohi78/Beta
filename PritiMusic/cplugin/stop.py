@@ -1,6 +1,8 @@
 from pyrogram import filters, Client
 from pyrogram.types import Message
+from pyrogram.enums import ChatMemberStatus # 🟢 Zaroori Import
 
+import config # 🟢 Zaroori Import
 from PritiMusic.core.call import Lucky
 from PritiMusic.utils.database import set_loop
 from PritiMusic.utils.inline import close_markup
@@ -20,7 +22,18 @@ from PritiMusic.cplugin.utils.decorators.admins import AdminRightsCheck
     & ~BANNED_USERS
 )
 @AdminRightsCheck # <-- Ab ye Clone Owner/Sudo ko allow karega
-async def stop_music(cli, message: Message, _, chat_id):
+async def stop_music(cli: Client, message: Message, _, chat_id):
+    
+    # 🟢 THE FIX: BULLETPROOF ADMIN CHECK
+    # Agar kisi aam user ne gaana stop karne ki koshish ki, toh yeh usko block kar dega
+    if message.from_user.id not in config.SUDOERS:
+        try:
+            member = await cli.get_chat_member(chat_id, message.from_user.id)
+            if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
+                return await message.reply_text("❌ **Sirf Admins he is command ko use kar sakte hain!**")
+        except Exception:
+            return await message.reply_text("❌ **Error: Admin rights verify nahi ho paye.**")
+
     if len(message.command) != 1:
         return
     
