@@ -1,10 +1,13 @@
 import random
+import asyncio
 from pyrogram import filters, Client
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.enums import ChatMemberStatus # 🟢 ZAROORI IMPORT
 
+import config # 🟢 ZAROORI IMPORT
 from PritiMusic import app
 from PritiMusic.core.call import Lucky
-from PritiMusic.utils.database import music_off
+from PritiMusic.utils.database import is_music_playing, music_off # 🟢 is_music_playing ADD KIYA
 from config import BANNED_USERS
 
 # ✅ Kurigram Button Style Import
@@ -39,8 +42,21 @@ def action_btn(text, callback_data=None, url=None, style=ButtonStyle.PRIMARY, us
 
 @Client.on_message(filters.command(["pause", "cpause"]) & filters.group & ~BANNED_USERS)
 @AdminRightsCheck 
-async def pause_admin(cli, message: Message, _, chat_id):
+async def pause_admin(cli: Client, message: Message, _, chat_id):
     
+    # 🟢 THE FIX 1: BULLETPROOF ADMIN CHECK (Wapas lagaya gaya)
+    if message.from_user.id not in config.SUDOERS:
+        try:
+            member = await cli.get_chat_member(chat_id, message.from_user.id)
+            if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
+                return await message.reply_text("❌ **Sirf Admins he is command ko use kar sakte hain!**")
+        except Exception:
+            return await message.reply_text("❌ **Error: Admin rights verify nahi ho paye.**")
+
+    # 🟢 THE FIX 2: CHECK KARO KI KYA MUSIC CHAL BHI RAHA HAI?
+    if not await is_music_playing(chat_id):
+        return await message.reply_text(_["admin_1"])
+
     # 1. Database mein music off mark karein
     await music_off(chat_id)
     
