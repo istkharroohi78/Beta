@@ -1,88 +1,84 @@
-import asyncio
+import random
 from pyrogram import filters, Client
 from pyrogram.types import Message
-from pyrogram.enums import ChatMemberStatus
 
 import config
 from PritiMusic import app
 from PritiMusic.core.call import Lucky
-from PritiMusic.misc import db, SUDOERS # ✅ Yahan SUDOERS add kar diya gaya hai
+from PritiMusic.misc import db
 
-# ✅ Imports Updated
+# ✅ Sirf jo zaroori hai wahi import kiya
 from PritiMusic.utils.database import get_loop
-from PritiMusic.cplugin.utils.decorators.admins import AdminRightsCheck
+from PritiMusic.utils.decorators import AdminRightsCheck
 from PritiMusic.utils.inline import close_markup
 from PritiMusic.utils.stream.autoclear import auto_clean
 from config import BANNED_USERS
 
-# 🟢 THE FIX 1: @Client.on_message Clone bots ke liye ekdum sahi hai
-@Client.on_message(
-    filters.command(["skip", "cskip", "next", "cnext"], prefixes=["/", "!", "%", ",", ".", "@", "#"])
-    & filters.group 
-    & ~BANNED_USERS
+
+@app.on_message(
+    filters.command(["skip", "cskip", "next", "cnext"], prefixes=["/", "!"]) & filters.group & ~BANNED_USERS
 )
 @AdminRightsCheck
-async def skip_comm(cli: Client, message: Message, _, chat_id):
+async def skip(cli: Client, message: Message, _, chat_id):
     
-    # 🟢 THE FIX 2: BULLETPROOF ADMIN CHECK
-    # Agar decorator fail ho jaye, toh yeh manual check kisi bhi aam user ko rok dega.
-    user_id = message.from_user.id
-    if user_id not in SUDOERS: # ✅ config.SUDOERS hata kar sirf SUDOERS kar diya
-        try:
-            member = await cli.get_chat_member(chat_id, user_id)
-            if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
-                return await message.reply_text("❌ **You don't have permission to use this command. Only Admins can skip.**")
-        except Exception:
-            return await message.reply_text("❌ **You don't have permission to use this command. Only Admins can skip.**")
+    # 🛑 THE CLASH FIX (MAIN BOT): Agar command Clone Bot pe aayi hai, toh Main Bot ignore karega!
+    try:
+        if cli.me.id != app.id:
+            return
+    except Exception:
+        pass
 
-    # 1. Queue check
+    # Queue check karte hain
     check = db.get(chat_id)
     if not check:
         return await message.reply_text(_["queue_2"])
-    
-    # 2. Loop check (Agar loop on hai, toh skip allow nahi hoga)
+        
+    # Loop on/off check
     loop = await get_loop(chat_id)
     if loop != 0:
         return await message.reply_text(_["admin_8"])
 
-    # 3. Multi-skip logic (e.g., /skip 3)
-    skip_count = 1
+    # Multi-skip logic (jaise /skip 3)
     if len(message.command) > 1:
         state = message.text.split(None, 1)[1].strip()
         if state.isnumeric():
             state = int(state)
-            if 1 <= state <= len(check):
-                skip_count = state
+            count = len(check)
+            if count > 2:
+                count = int(count - 1)
+                if 1 <= state <= count:
+                    for x in range(state - 1): # (state-1) elements pop karenge
+                        try:
+                            popped = check.pop(0)
+                            if popped:
+                                await auto_clean(popped)
+                        except:
+                            pass
+                else:
+                    return await message.reply_text(_["admin_11"].format(count))
             else:
-                return await message.reply_text(_["admin_11"].format(len(check)))
+                return await message.reply_text(_["admin_10"])
         else:
             return await message.reply_text(_["admin_11"].format(len(check)-1))
 
-    # 4. Actual Skip Logic
+    # 🟢 THE REAL FIX FOR THE SCREENSHOT ERROR 🟢
     try:
-        # Pehle (skip_count - 1) songs ko queue se nikal kar clean up karo
-        if skip_count > 1:
-            for x in range(skip_count - 1):
-                try:
-                    popped = check.pop(0)
-                    if popped:
-                        await auto_clean(popped)
-                except:
-                    pass
-        
-        # Sahi PyTgCalls client (assistant) get karo
-        clients = await Lucky.get_active_clients(chat_id)
-        pytgcalls_client = clients[0] if clients else Lucky.one
-            
-        # change_stream call karo. 
-        # Yeh automatic bacha hua gaana pop karega, next play karega, aur UI stream_card bhej dega!
+        # Sahi PyTgCalls client (assistant) nikalte hain taaki internal error na aaye
+        pytgcalls_client = Lucky.one
+        if chat_id in Lucky.active_clients:
+            val = Lucky.active_clients[chat_id]
+            if isinstance(val, list) and len(val) > 0:
+                pytgcalls_client = val[0]
+            elif val and not isinstance(val, list):
+                pytgcalls_client = val
+                
+        # 🔥 Pura lamba code replace karke seedha change_stream call
+        # Yeh khud current track pop karega, agla play karega aur message bhejega.
+        # Queue khali hui toh automatically Autoplay handle kar lega.
         await Lucky.change_stream(pytgcalls_client, chat_id)
         
-        # Skip confirmation
-        await message.reply_text(f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🎄\n└ʙʏ : {message.from_user.mention}")
-        
     except Exception as e:
-        # Agar error aaya toh gracefully handle karo
+        # Agar koi error aata hai toh gracefully stop kar denge
         try:
             await message.reply_text(
                 text=_["admin_6"].format(message.from_user.mention, message.chat.title),
