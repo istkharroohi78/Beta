@@ -27,7 +27,7 @@ def get_safe_filename(title: str, default_id: str) -> str:
         return default_id
     return re.sub(r'[\\/*?:"<>|]', "", title).strip()
 
-# 🟢 THE FIX: Perfect YouTube ID Extractor for all link types
+# 🟢 Perfect YouTube ID Extractor for all link types
 def extract_video_id(link: str) -> str:
     if "youtu.be/" in link:
         return link.split("youtu.be/")[1].split("?")[0]
@@ -99,7 +99,7 @@ async def ytdl_fallback_download(link: str, download_type: str, title: str = Non
         'outtmpl': file_path,
         'quiet': True,
         'no_warnings': True,
-        'cookiefile': 'cookies.txt', 
+        'cookiefile': 'cookies.txt', # 🟢 Cookies enabled here
         'extractor_args': {'youtube': ['player_client=ios,tv_embedded']}, 
         'geo_bypass': True,
         'nocheckcertificate': True,
@@ -226,14 +226,19 @@ async def download_song(link: str, title: str = None) -> str:
         except Exception:
             pass
 
-    api_result = await api_download(video_id, "audio", title)
-    if api_result: return api_result
-    
+    # 🟢 1ST PRIORITY: yt-dlp with cookies.txt
+    LOGGER.info(f"Attempting download with yt-dlp (cookies) for: {title}")
     yt_result = await ytdl_fallback_download(link, "audio", title)
     if yt_result: return yt_result
     
+    # 🟡 2ND PRIORITY: API Fallback (Shruti Bots API)
+    LOGGER.warning(f"yt-dlp failed. Falling back to Fast API for: {title}")
+    api_result = await api_download(video_id, "audio", title)
+    if api_result: return api_result
+    
+    # 🔴 3RD PRIORITY: Source-Hopping (Spotify, JioSaavn, SoundCloud)
     if title:
-        LOGGER.warning(f"🔴 YouTube blocked '{title}'. Hopping to Spotify...")
+        LOGGER.warning(f"🔴 YouTube & API blocked '{title}'. Hopping to Spotify...")
         sp_result = await spotify_fallback_download(title)
         if sp_result: return sp_result
 
@@ -261,9 +266,17 @@ async def download_video(link: str, title: str = None) -> str:
         except:
             pass
 
+    # 🟢 1ST PRIORITY: yt-dlp with cookies.txt
+    LOGGER.info(f"Attempting video download with yt-dlp (cookies) for: {title}")
+    yt_result = await ytdl_fallback_download(link, "video", title)
+    if yt_result: return yt_result
+
+    # 🟡 2ND PRIORITY: API Fallback
+    LOGGER.warning(f"yt-dlp failed. Falling back to Fast API video download for: {title}")
     api_result = await api_download(video_id, "video", title)
     if api_result: return api_result
-    return await ytdl_fallback_download(link, "video", title)
+
+    return None
 
 # ----------------- YOUTUBE API CLASS -----------------
 
