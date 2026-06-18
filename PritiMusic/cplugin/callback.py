@@ -6,7 +6,7 @@ from pyrogram.types import CallbackQuery, InputMediaPhoto, InlineKeyboardMarkup
 import config
 from PritiMusic import app, YouTube
 from PritiMusic.core.call import Lucky
-from PritiMusic.misc import SUDOERS, db
+from PritiMusic.misc import db # ✅ SUDOERS hata diya hai
 from PritiMusic.utils.database import (
     get_active_chats, get_lang, get_upvote_count, is_active_chat,
     is_music_playing, is_nonadmin_chat, music_off, music_on, set_loop, get_assistant
@@ -36,10 +36,17 @@ def get_random_img(img_list):
 # CALLBACK HANDLERS
 # =====================================================================
 
-# 🟢 THE FIX 1: @app ko @Client mein badal diya
 @Client.on_callback_query(filters.regex("settingsback_helper") & ~BANNED_USERS)
 @languageCB
 async def settings_back_helper(client: Client, CallbackQuery, _):
+    
+    # 🛑 THE CLASH FIX (CLONE BOT): Main bot ko interference se rokne ke liye
+    try:
+        if client.me.id == app.id:
+            return
+    except Exception:
+        pass
+        
     await CallbackQuery.answer()
     img = get_random_img(config.START_IMG_URL)
     await CallbackQuery.edit_message_media(
@@ -47,10 +54,17 @@ async def settings_back_helper(client: Client, CallbackQuery, _):
         reply_markup=InlineKeyboardMarkup(private_panel(_))
     )
 
-# 🟢 THE FIX 2: @app ko @Client mein badla taaki CLONE BOTS bhi buttons sunein!
 @Client.on_callback_query(filters.regex("ADMIN") & ~BANNED_USERS)
 @languageCB
 async def del_back_playlist(client: Client, CallbackQuery, _):
+    
+    # 🛑 THE CLASH FIX (CLONE BOT)
+    try:
+        if client.me.id == app.id:
+            return
+    except Exception:
+        pass
+        
     bot = await client.get_me()
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -68,13 +82,17 @@ async def del_back_playlist(client: Client, CallbackQuery, _):
     user_id = CallbackQuery.from_user.id
     user_name = CallbackQuery.from_user.first_name
     
-    # Auth Check
+    # 🟢 PURE GROUP ADMIN CHECK (No SUDOERS)
     is_non_admin = await is_nonadmin_chat(chat_id)
     if not is_non_admin:
-        if CallbackQuery.from_user.id not in SUDOERS:
-            admins = adminlist.get(chat_id)
-            if not admins or CallbackQuery.from_user.id not in admins:
-                return await CallbackQuery.answer(_["admin_14"], show_alert=True)
+        try:
+            member = await client.get_chat_member(chat_id, CallbackQuery.from_user.id)
+            if member.status not in ["administrator", "creator"]:
+                admins = adminlist.get(chat_id)
+                if not admins or CallbackQuery.from_user.id not in admins:
+                    return await CallbackQuery.answer(_["admin_14"], show_alert=True)
+        except Exception:
+            return await CallbackQuery.answer(_["admin_14"], show_alert=True)
 
     if command == "UpVote":
         if chat_id not in votemode: votemode[chat_id] = {}
@@ -146,9 +164,18 @@ async def del_back_playlist(client: Client, CallbackQuery, _):
                 await CallbackQuery.message.reply_text(_["admin_6"].format(mention, CallbackQuery.message.chat.title), reply_markup=close_markup(_))
                 return await Lucky.stop_stream(chat_id)
             
-            # 🟢 THE FIX 3: Safe Skip logic for clones (Same as our updated skip.py)
-            clients = await Lucky.get_active_clients(chat_id)
-            pytgcalls_client = clients[0] if clients else Lucky.one
+            # 🟢 SAFE SKIP LOGIC
+            pytgcalls_client = Lucky.one
+            try:
+                if hasattr(Lucky, "get_active_clients"):
+                    clients = await Lucky.get_active_clients(chat_id)
+                    pytgcalls_client = clients[0] if clients else Lucky.one
+                elif hasattr(Lucky, "active_clients") and chat_id in Lucky.active_clients:
+                    val = Lucky.active_clients[chat_id]
+                    pytgcalls_client = val[0] if isinstance(val, list) and val else val
+            except Exception:
+                pass
+                
             await Lucky.change_stream(pytgcalls_client, chat_id)
             return await CallbackQuery.edit_message_text(f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🎄", reply_markup=close_markup(_))
             
