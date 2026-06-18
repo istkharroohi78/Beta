@@ -1,9 +1,9 @@
 from pyrogram import filters, Client
 from pyrogram.types import Message
-from pyrogram.enums import ChatMemberStatus # 🟢 Zaroori Import
+from pyrogram.enums import ChatMemberStatus 
 
-import config # 🟢 Zaroori Import
-from PritiMusic import app
+import config 
+from PritiMusic import app # 🟢 Main bot ko pehchanne ke liye zaroori import
 from PritiMusic.utils import extract_user, int_to_alpha
 from PritiMusic.utils.database import (
     delete_authuser,
@@ -11,7 +11,7 @@ from PritiMusic.utils.database import (
     get_authuser_names,
     save_authuser,
 )
-from PritiMusic.utils.decorators import AdminActual, language
+from PritiMusic.cplugin.utils.decorators.admins import AdminActual, language # 🟢 Clone decorator import
 from PritiMusic.utils.inline import close_markup
 from config import BANNED_USERS, adminlist
 
@@ -19,15 +19,20 @@ from config import BANNED_USERS, adminlist
 @AdminActual
 async def auth(client: Client, message: Message, _):
     
-    # 🟢 THE FIX: BULLETPROOF ADMIN CHECK
-    # Koi aam user kisi ko auth nahi kar payega
-    if message.from_user.id not in config.SUDOERS:
-        try:
-            member = await client.get_chat_member(message.chat.id, message.from_user.id)
-            if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
-                return await message.reply_text("❌ **Sirf Admins he is command ko use kar sakte hain!**")
-        except Exception:
-            return await message.reply_text("❌ **Error: Admin rights verify nahi ho paye.**")
+    # 🛑 THE CLASH FIX (CLONE BOT)
+    try:
+        if client.me.id == app.id:
+            return
+    except Exception:
+        pass
+    
+    # 🟢 PURE GROUP ADMIN CHECK (No config.SUDOERS)
+    try:
+        member = await client.get_chat_member(message.chat.id, message.from_user.id)
+        if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
+            return await message.reply_text("❌ **Sirf Admins hi is command ko use kar sakte hain!**")
+    except Exception:
+        return await message.reply_text("❌ **Error: Admin rights verify nahi ho paye.**")
 
     if not message.reply_to_message:
         if len(message.command) != 2:
@@ -61,18 +66,25 @@ async def auth(client: Client, message: Message, _):
     else:
         return await message.reply_text(_["auth_3"].format(user.mention))
 
+
 @Client.on_message(filters.command(["unauth", "cunauth"], prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group & ~BANNED_USERS)
 @AdminActual
 async def unauthusers(client: Client, message: Message, _):
     
-    # 🟢 THE FIX: BULLETPROOF ADMIN CHECK
-    if message.from_user.id not in config.SUDOERS:
-        try:
-            member = await client.get_chat_member(message.chat.id, message.from_user.id)
-            if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
-                return await message.reply_text("❌ **Sirf Admins he is command ko use kar sakte hain!**")
-        except Exception:
-            return await message.reply_text("❌ **Error: Admin rights verify nahi ho paye.**")
+    # 🛑 THE CLASH FIX (CLONE BOT)
+    try:
+        if client.me.id == app.id:
+            return
+    except Exception:
+        pass
+    
+    # 🟢 PURE GROUP ADMIN CHECK (No config.SUDOERS)
+    try:
+        member = await client.get_chat_member(message.chat.id, message.from_user.id)
+        if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
+            return await message.reply_text("❌ **Sirf Admins hi is command ko use kar sakte hain!**")
+    except Exception:
+        return await message.reply_text("❌ **Error: Admin rights verify nahi ho paye.**")
 
     if not message.reply_to_message:
         if len(message.command) != 2:
@@ -92,9 +104,18 @@ async def unauthusers(client: Client, message: Message, _):
     else:
         return await message.reply_text(_["auth_5"].format(user.mention))
 
+
 @Client.on_message(filters.command(["authlist", "authusers", "cauthlist"], prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group & ~BANNED_USERS)
 @language
 async def authusers(client: Client, message: Message, _):
+    
+    # 🛑 THE CLASH FIX (CLONE BOT)
+    try:
+        if client.me.id == app.id:
+            return
+    except Exception:
+        pass
+
     auth_names = await get_authuser_names(message.chat.id)
     
     if not auth_names:
