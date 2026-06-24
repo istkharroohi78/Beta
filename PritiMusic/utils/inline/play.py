@@ -37,7 +37,7 @@ def create_btn(text, cb=None, url=None, style=ButtonStyle.PRIMARY, no_emoji=Fals
 def clone_button(style):
     return create_btn(
         text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", 
-        url="https://t.me/clone_MUSICrobot",
+        url="https://t.me/SizzuMusicBot",
         style=style
     )
 
@@ -45,7 +45,7 @@ def clone_button(style):
 def add_me_button(style):
     return create_btn(
         text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』",
-        url="https://t.me/clone_MUSICrobot?startgroup=true",
+        url="https://t.me/SizzuMusicBot?startgroup=true",
         style=style
     )
 
