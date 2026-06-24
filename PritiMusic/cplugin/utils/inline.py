@@ -5,13 +5,14 @@ from button import styled_button, ButtonStyle # Zaroori import
 buttons = InlineKeyboardMarkup(
     [
         [
-            styled_button(text="▷", callback_data="resume_cb", style=ButtonStyle.SUCCESS),
-            styled_button(text="II", callback_data="pause_cb", style=ButtonStyle.DANGER),
-            styled_button(text="‣‣I", callback_data="skip_cb", style=ButtonStyle.PRIMARY),
-            styled_button(text="▢", callback_data="end_cb", style=ButtonStyle.DANGER),
-        ],
+                styled_button(text="▷", callback_data=f"ADMIN Resume|{chat_id}", style=ButtonStyle.SUCCESS),
+                styled_button(text="II", callback_data=f"ADMIN Pause|{chat_id}", style=ButtonStyle.DANGER),
+                styled_button(text="↺", callback_data=f"ADMIN Replay|{chat_id}", style=ButtonStyle.PRIMARY),
+                styled_button(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}", style=ButtonStyle.PRIMARY),
+                styled_button(text="▢", callback_data=f"ADMIN Stop|{chat_id}", style=ButtonStyle.DANGER),
+            ],
         [
-            styled_button(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.me/clone_MUSICrobot", style=ButtonStyle.SUCCESS)
+            styled_button(text=" 𝐂ʟᴏηє 𝐌є ", url="https://t.me/SizzuMusicBot", style=ButtonStyle.SUCCESS)
         ],
     ]
 )
@@ -19,7 +20,7 @@ buttons = InlineKeyboardMarkup(
 close_key = InlineKeyboardMarkup(
     [
         [
-            styled_button(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true", style=ButtonStyle.SUCCESS),
+            #styled_button(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true", style=ButtonStyle.SUCCESS),
             styled_button(text="✯ CLOSE ✯", callback_data="close", style=ButtonStyle.DANGER)
         ]
     ]
@@ -30,26 +31,27 @@ def stream_markup(chat_id):
     return InlineKeyboardMarkup(
         [
             # Top Row: Basic Controls
-            [
+          [
                 styled_button(text="▷", callback_data=f"ADMIN Resume|{chat_id}", style=ButtonStyle.SUCCESS),
                 styled_button(text="II", callback_data=f"ADMIN Pause|{chat_id}", style=ButtonStyle.DANGER),
+                styled_button(text="↺", callback_data=f"ADMIN Replay|{chat_id}", style=ButtonStyle.PRIMARY),
                 styled_button(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}", style=ButtonStyle.PRIMARY),
                 styled_button(text="▢", callback_data=f"ADMIN Stop|{chat_id}", style=ButtonStyle.DANGER),
             ],
             # Middle Row: Seek, Loop & Shuffle
             [
                 styled_button(text="<- 20s", callback_data=f"ADMIN SeekBack|{chat_id}", style=ButtonStyle.PRIMARY),
-                styled_button(text="🔁", callback_data=f"ADMIN Loop|{chat_id}", style=ButtonStyle.PRIMARY),
-                styled_button(text="🔀", callback_data=f"ADMIN Shuffle|{chat_id}", style=ButtonStyle.PRIMARY),
+                #styled_button(text="🔁", callback_data=f"ADMIN Loop|{chat_id}", style=ButtonStyle.PRIMARY),
+                #styled_button(text="🔀", callback_data=f"ADMIN Shuffle|{chat_id}", style=ButtonStyle.PRIMARY),
                 styled_button(text="20s + ->", callback_data=f"ADMIN SeekForward|{chat_id}", style=ButtonStyle.PRIMARY),
             ],
             # Bottom Row 1: Clone
             [
-                styled_button(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.me/clone_MUSICrobot", style=ButtonStyle.SUCCESS)
+                styled_button(text="『 ✦ 𝐂ʟᴏηє 𝐌є ✦ 』", url="https://t.meSizzuMusicBot/", style=ButtonStyle.SUCCESS)
             ],
             # Bottom Row 2: Add Me & Close
             [
-                styled_button(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true", style=ButtonStyle.SUCCESS),
+                #styled_button(text="『 ♡ 𝐀ᴅᴅ 𝐌є 𝐁ᴀʙʏ ♡ 』", url="https://t.me/clone_MUSICrobot?startgroup=true", style=ButtonStyle.SUCCESS),
                 styled_button(text="✯ CLOSE ✯", callback_data="close", style=ButtonStyle.DANGER)
             ]
         ]
